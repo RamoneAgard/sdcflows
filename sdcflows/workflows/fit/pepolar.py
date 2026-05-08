@@ -129,7 +129,7 @@ def init_topup_wf(
     )
     # Average each run so that topup is not overwhelmed (see #279)
     runwise_avg = pe.MapNode(
-        RobustAverage(num_threads=omp_nthreads),
+        RobustAverage(num_threads=omp_nthreads, mc_method="FSL"),
         name="runwise_avg",
         iterfield="in_file",
     )
@@ -180,7 +180,7 @@ def init_topup_wf(
         (sort_pe_blips, concat_blips, [("out_data", "in_files")]),
         (concat_blips, pad_blip_slices, [("out_file", "in_file")]),
         (pad_blip_slices, setwise_avg, [("out_file", "in_file")]),
-        (setwise_avg, to_las, [("out_hmc_volumes", "in_file")]),
+        (setwise_avg, to_las, [("out_volumes", "in_file")]),
         (sort_pe_blips, to_las, [("pe_dirs_fsl", "pe_dir")]),
         (to_las, topup, [
             ("out_file", "in_file"),
@@ -226,7 +226,7 @@ def init_topup_wf(
     # fmt:off
     workflow.connect([
         (fix_coeff, unwarp, [("out_coeff", "in_coeff")]),
-        (setwise_avg, unwarp, [("out_hmc_volumes", "in_data")]),
+        (setwise_avg, unwarp, [("out_volumes", "in_data")]),
         (sort_pe_blips, unwarp, [("readout_times", "ro_time"),
                                  ("pe_dirs", "pe_dir")]),
         (unwarp, outputnode, [("out_field", "fmap")]),

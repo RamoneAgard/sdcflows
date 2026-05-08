@@ -129,7 +129,7 @@ def init_topup_wf(
     )
     # Average each run so that topup is not overwhelmed (see #279)
     runwise_avg = pe.MapNode(
-        RobustAverage(num_threads=omp_nthreads),
+        RobustAverage(num_threads=omp_nthreads, mc_method="FSL"),
         name="runwise_avg",
         iterfield="in_file",
     )
